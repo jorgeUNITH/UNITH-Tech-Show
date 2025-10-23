@@ -1,155 +1,159 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atención al Cliente</title>
-    <!-- Carga de Tailwind CSS para estilos modernos y responsivos -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Estilos personalizados para el gradiente de fondo solicitado */
-        .custom-gradient-bg {
-            background: linear-gradient(to bottom, rgb(239, 246, 255) 0%, rgba(59, 130, 246, 0.5) 100%);
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Atención al Cliente</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .custom-gradient-bg {
+      background: linear-gradient(to bottom, rgb(239, 246, 255) 0%, rgba(59, 130, 246, 0.5) 100%);
+    }
 
-        /* Estilos base para el cuerpo - Fuente "Inter" como se utiliza en unith.ai */
-        body {
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto; /* Permite desplazamiento si es necesario */
-        }
+    html, body { height: 100%; }
+    body {
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto; /* asegura scroll */
+    }
 
-        /* Estilo específico para el marco del teléfono móvil */
-        .mobile-frame {
-            /* Simulación del cuerpo del teléfono */
-            width: 375px;
-            height: 667px;
-            padding: 40px 10px;
-            border: 8px solid #333;
-            background-color: #000;
-            border-radius: 40px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            position: relative;
-        }
+    /* ===== TELÉFONO =====
+       Controlamos por ALTO (vh) para que nunca se corte.
+    */
+    .mobile-frame {
+      /* Alto máximo relativo a la ventana; si la pantalla es pequeña, baja aún más */
+      height: min(78vh, 720px);
+      /* Deriva el ancho automáticamente con aspect-ratio (no lo fijamos) */
+      width: auto;
+      aspect-ratio: 375 / 667;
 
-        /* Simulación de la "muesca" (notch) del móvil */
-        .mobile-frame::before {
-            content: '';
-            position: absolute;
-            top: 5px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 120px;
-            height: 25px;
-            background-color: #000;
-            border-radius: 0 0 15px 15px;
-            z-index: 10;
-        }
+      padding: clamp(8px, 2.2vw, 40px) clamp(4px, 1.2vw, 12px);
+      border: clamp(2px, 0.9vw, 8px) solid #333;
+      background-color: #000;
+      border-radius: clamp(14px, 4vw, 40px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      position: relative;
+      overflow: hidden;
+      max-width: 92vw;       /* que no exceda el ancho de la pantalla */
+    }
+    .mobile-frame::before {
+      content: '';
+      position: absolute;
+      top: 1.4%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 32%;
+      height: 4.2%;
+      background-color: #000;
+      border-radius: 0 0 12px 12px;
+      z-index: 10;
+    }
 
-        /* --- ESTILOS PARA EL PORTÁTIL --- */
+    .frame-area {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: white;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .frame-area > iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: white;
+    }
 
-        /* Contenedor principal del portátil */
-        .laptop-container {
-            width: 900px; /* Ancho del dispositivo total en escritorio */
-            max-width: 95vw;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        /* Marco de la pantalla (incluye bisel) */
-        .laptop-screen-frame {
-            width: 100%;
-            height: 550px;
-            background-color: #000;
-            border-radius: 12px 12px 0 0; /* Esquinas superiores redondeadas */
-            padding: 15px; /* Simula el bisel */
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            position: relative;
-            z-index: 10;
-        }
+    /* ===== PORTÁTIL =====
+       Igual: limitamos por ALTO de viewport.
+    */
+    .laptop-container {
+      width: auto;            /* que fluya según su pantalla */
+      max-width: 95vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .laptop-screen-frame {
+      height: min(58vh, 620px);  /* nunca supera el alto de la ventana */
+      width: auto;
+      aspect-ratio: 16 / 10;     /* el ancho se calcula con esta proporción */
 
-        /* Base/Cuerpo del portátil (simulación de teclado) */
-        .laptop-base {
-            width: 100%;
-            height: 20px;
-            background-color: #444;
-            border-radius: 0 0 15px 15px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
-            margin-top: -1px; /* Solapamiento mínimo */
-            z-index: 5;
-        }
+      background-color: #000;
+      border-radius: 12px 12px 0 0;
+      padding: clamp(6px, 1.2vw, 15px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      position: relative;
+      z-index: 10;
+      overflow: hidden;
+      max-width: 95vw;           /* que no se salga en horizontal */
+    }
+    .laptop-base {
+      width: 100%;
+      height: clamp(8px, 1.8vw, 20px);
+      background-color: #444;
+      border-radius: 0 0 15px 15px;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+      margin-top: -1px;
+      z-index: 5;
+    }
 
-        /* Adaptación de tamaño del portátil en tablet/móvil */
-        @media (max-width: 1024px) {
-            .laptop-screen-frame {
-                height: 400px;
-                padding: 10px;
-            }
-        }
-
-        /* Estilos para el iframe de contenido */
-        iframe {
-            border: none;
-            width: 100%;
-            height: 100%;
-            background-color: white;
-            border-radius: 5px;
-        }
-    </style>
+    /* Pantallas de poca altura: reduce paddings para que todo quepa mejor */
+    @media (max-height: 700px) {
+      h1 { padding-top: 12px !important; padding-bottom: 12px !important; }
+      .mobile-frame { height: min(72vh, 620px); }
+      .laptop-screen-frame { height: min(52vh, 520px); }
+    }
+  </style>
 </head>
 <body class="custom-gradient-bg">
 
-    <!-- Título principal directamente sobre el fondo -->
-    <h1 class="text-4xl md:text-5xl font-extrabold text-blue-800 pt-8 pb-10 text-center drop-shadow-lg">
-        Atención al Cliente
-    </h1>
+  <h1 class="text-4xl md:text-5xl font-extrabold text-blue-800 pt-6 pb-4 text-center drop-shadow-lg">
+    Atención al Cliente
+  </h1>
 
-    <!-- Contenedor principal de los dispositivos -->
-    <!-- En móvil: Los apila verticalmente (flex-col). En escritorio (lg): Los pone en fila (lg:flex-row) -->
-    <main class="flex flex-col lg:flex-row items-center justify-center p-4 lg:p-10 gap-8 lg:gap-16 flex-grow">
-
-        <!-- 1. DISPOSITIVO MÓVIL (Visible en todas las pantallas) -->
-        <div class="dispositivo">
-            <h2 class="text-xl font-semibold text-gray-700 mb-4 text-center">Teléfono Móvil (375px)</h2>
-            <div class="mobile-frame overflow-hidden">
-                <div class="w-full h-full bg-white rounded-lg overflow-hidden">
-                    <iframe 
-                        src="https://www.duplach.com/" 
-                        title="Vista Móvil de Duplach"
-                        loading="lazy">
-                    </iframe>
-                </div>
-            </div>
+  <!-- quitamos flex-grow para no forzar a ocupar todo el alto -->
+  <main class="flex flex-col lg:flex-row items-start justify-start p-4 lg:p-8 gap-8 lg:gap-12">
+    <!-- Teléfono -->
+    <section class="dispositivo w-full flex flex-col items-center">
+      <h2 class="text-xl font-semibold text-gray-700 mb-3 text-center">Teléfono Móvil (fluido)</h2>
+      <div class="mobile-frame">
+        <div class="frame-area">
+          <iframe
+            src="https://www.duplach.com/"
+            title="Vista Móvil"
+            loading="lazy"
+            allow="autoplay; fullscreen; picture-in-picture">
+          </iframe>
         </div>
+      </div>
+    </section>
 
-        <!-- 2. DISPOSITIVO PORTÁTIL (Oculto en móvil, visible en escritorio) -->
-        <div class="dispositivo hidden lg:block">
-            <h2 class="text-xl font-semibold text-gray-700 mb-4 text-center">Portátil (Horizontal)</h2>
-            <div class="laptop-container">
-                <!-- Marco de la pantalla con bisel -->
-                <div class="laptop-screen-frame overflow-hidden">
-                    <div class="w-full h-full bg-white rounded-sm overflow-hidden">
-                        <iframe 
-                            src="https://www.duplach.com/" 
-                            title="Vista Portátil de Duplach"
-                            loading="lazy">
-                        </iframe>
-                    </div>
-                </div>
-                <!-- Base/Teclado del portátil -->
-                <div class="laptop-base"></div>
-            </div>
+    <!-- Portátil (oculto en móvil) -->
+    <section class="dispositivo hidden lg:flex flex-col items-center">
+      <h2 class="text-xl font-semibold text-gray-700 mb-3 text-center">Portátil (fluido)</h2>
+      <div class="laptop-container">
+        <div class="laptop-screen-frame">
+          <div class="frame-area">
+            <iframe
+              src="https://www.duplach.com/"
+              title="Vista Portátil"
+              loading="lazy"
+              allow="autoplay; fullscreen; picture-in-picture">
+            </iframe>
+          </div>
         </div>
+        <div class="laptop-base"></div>
+      </div>
+    </section>
+  </main>
 
-    </main>
-
-    <!-- Indicador de responsividad para el usuario (opcional) -->
-    <footer class="text-center p-4 text-gray-500 text-sm">
-        <p>En pantallas pequeñas, la vista de Portátil se oculta automáticamente.</p>
-    </footer>
+  <footer class="text-center p-5 text-gray-500 text-sm">
+    <p>En pantallas pequeñas, la vista de Portátil se oculta automáticamente.</p>
+  </footer>
 
 </body>
 </html>
