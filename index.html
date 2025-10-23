@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unith AI - Selecciona tu Asistente</title>
+  <!-- Favicons (solo disposición, no cambia estilos) -->
+  <link rel="icon" type="image/png" sizes="16x16" href="images/Favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="images/Favicon.png">
+    <!-- Carga de Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Configuración para usar la fuente Space Grotesk --><style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap');
+        :root {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        /* Color de fondo solicitado */
+        body {
+            /* Fondo como la imagen: claro arriba → azul abajo + patrón de puntos sutil */
+            background-image:
+              linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 35%), /* desvanecido superior para los puntos */
+              radial-gradient(circle at 1px 1px, rgba(59,130,246,0.18) 1px, transparent 1.5px), /* puntos azules */
+              linear-gradient(180deg, #F6FAFF 0%, #CFE0FF 45%, #9AB6FF 100%); /* degradado base */
+            background-size: auto, 18px 18px, auto;
+            background-repeat: no-repeat, repeat, no-repeat;
+            min-height: 100vh;
+        }
+        /* Estilo para las banderas (banderas como emojis) */
+        .flag-icon {
+            font-size: 4.5rem; /* AUMENTADO: Banderas más grandes */
+            transition: transform 0.2s;
+        }
+        .flag-icon:hover {
+            transform: scale(1.1);
+        }
+        /* Estilos para el contenedor del Iframe de pantalla completa */
+        #iframe-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 50; /* Asegura que esté por encima de todo */
+            background-color: white; /* Fondo blanco para el chat */
+        }
+        #chat-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'unith-blue': '#3B82F6',
+                        'unith-dark': '#1F2937',
+                    }
+                }
+            }
+        }
+
+        // Definición de las URLs por sección e idioma
+        const CHAT_URLS = {
+            HR: {
+                name: "Recursos Humanos",
+                ES: "https://jorgeunith.github.io/UNITH-Digital-Human-Interview-Demo/",
+                UK: "https://jorgeunith.github.io/UNITH-Digital-Human-Interview-Demo/"
+            },
+            Sales: {
+                name: "Ventas",
+                ES: "Lead_Gen.html",
+                UK: "Lead_Gen.html"
+            },
+            CustomerSupport: {
+                name: "Atención al Cliente",
+                ES: "Customer%20Care.html",
+                UK: "Customer%20Care.html"
+            },
+            ELearning: {
+                name: "E-learning",
+                ES: "e_learning.html",
+                UK: "e_learning.html"
+            },
+            CarShowroom: {
+                name: "Car Showroom",
+                ES: "https://jorgeunith.github.io/UNITH-Digital-Human-Real-Time-Visual-Control/#topic=ad",
+                UK: "https://jorgeunith.github.io/UNITH-Digital-Human-Real-Time-Visual-Control/#topic=ad"
+            },
+            CaptureLead: {
+                name: "Capture Lead",
+                ES: "https://jorgeunith.github.io/UNITH-Digital-Human-Real-Time-Visual-Control/#topic=ad",
+                UK: "https://jorgeunith.github.io/UNITH-Digital-Human-Real-Time-Visual-Control/#topic=ad"
+            },
+            StreamingVideo: {
+                name: "Streaming Video",
+                ES: "https://jorgeunith.github.io/UNITH-Digital-Human-Real-Time-Visual-Control/#topic=ad",
+                UK: "https://jorgeunith.github.io/UNITH-Digital-Human-Real-Time-Visual-Control/#topic=ad"
+            },
+            StreamingLive: {
+                name: "Streaming Live",
+                ES: "https://jorgeunith.github.io/UNITH-Digital-Human-Real-Time-Visual-Control/#topic=ad",
+                UK: "https://jorgeunith.github.io/UNITH-Digital-Human-Real-Time-Visual-Control/#topic=ad"
+            }
+        };
+
+        let selectedSection = null;
+
+        /**
+         * Maneja el clic en una de las tarjetas de sección (HR, Sales, etc.).
+         * @param {string} sectionKey - La clave de la sección seleccionada.
+         */
+        function selectSection(sectionKey) {
+            selectedSection = sectionKey;
+            const sectionName = CHAT_URLS[sectionKey].name;
+
+            // 1. Ocultar todas las tarjetas (contenedor principal)
+            document.getElementById('main-container').classList.add('hidden');
+
+            // 2. Ocultar el mensaje inicial
+            document.getElementById('initial-message').classList.add('hidden');
+
+            // 3. Mostrar el nuevo subtítulo de confirmación
+            const subtitle = document.getElementById('selection-subtitle');
+            subtitle.textContent = `Has seleccionado: ${sectionName}. Ahora, elige el idioma.`;
+            subtitle.classList.remove('hidden');
+
+            // 4. Mostrar las opciones de idioma (banderas)
+            document.getElementById('language-selector').classList.remove('hidden');
+
+            // 5. Scroll suave al selector de idioma (útil en móvil)
+            setTimeout(() => {
+                document.getElementById('language-selector').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+
+        /**
+         * Función auxiliar para cargar el Iframe después de la verificación de permisos.
+         * @param {string} chatUrl - La URL del chat.
+         */
+        function loadIframe(chatUrl) {
+            const iframe = document.getElementById('chat-iframe');
+            iframe.src = chatUrl;
+
+            // Ocultar la landing page y mostrar el Iframe
+            document.getElementById('landing-content').classList.add('hidden');
+            document.getElementById('iframe-container').classList.remove('hidden');
+        }
+
+        /**
+         * Solicita permisos de cámara y micrófono al navegador.
+         * @returns {Promise<void>}
+         */
+        function requestMediaPermissions() {
+            return navigator.mediaDevices.getUserMedia({ audio: true, video: true })
+                .then(stream => {
+                    // Si los permisos son concedidos, detener el stream inmediatamente.
+                    // Esto evita mantener las luces de la cámara encendidas innecesariamente.
+                    if (stream) {
+                        stream.getTracks().forEach(track => track.stop());
+                    }
+                })
+                .catch(error => {
+                    console.error("Permiso de cámara/micrófono denegado o error:", error);
+                    // Aquí podrías mostrar un mensaje de error en la UI si fuera necesario
+                    // alert("Se requiere permiso de cámara y micrófono para esta demostración.");
+                    throw error; // Propagar el error para detener la carga del Iframe
+                });
+        }
+
+        /**
+         * Carga el chat en el iframe de pantalla completa, verificando permisos si es HR.
+         * @param {string} langKey - 'ES' o 'UK'.
+         */
+        function goToChat(langKey) {
+            if (selectedSection && CHAT_URLS[selectedSection] && CHAT_URLS[selectedSection][langKey]) {
+                const chatUrl = CHAT_URLS[selectedSection][langKey];
+                
+                if (selectedSection === 'HR') {
+                    // Si es HR, primero solicitamos los permisos
+                    requestMediaPermissions()
+                        .then(() => loadIframe(chatUrl))
+                        .catch(() => {
+                            // Si falla, no cargamos el iframe y volvemos al estado inicial
+                            closeIframe(); 
+                        });
+                } else {
+                    // Para otras secciones, cargamos directamente
+                    loadIframe(chatUrl);
+                }
+
+            } else {
+                console.error("Error: Sección o idioma no seleccionado correctamente.");
+            }
+        }
+
+        /**
+         * Cierra el iframe y recarga la página para volver al inicio.
+         */
+        function closeIframe() {
+            // Recarga la página para volver al estado inicial de forma limpia.
+            window.location.reload(); 
+        }
+    </script>
+</head>
+<body class="p-0 sm:p-0 flex flex-col items-center">
+
+  <!-- Top-left event badge: ahora es <a> (un solo fixed) -->
+    <a
+    href="https://unith-26838362.hubspotpagebuilder.eu/madrid-tech-show-2025"
+    target="_blank" rel="noopener noreferrer"
+    aria-label="Madrid Tech Show 2025"
+    class="fixed top-4 left-4 z-50 block rounded-xl bg-white/10 border border-white/20 backdrop-blur px-2 py-2 hover:bg-white/20 transition"
+  >
+    <img src="images/madrid_tech_show.webp" alt="Madrid Tech Show" class="h-10 w-auto md:h-12 object-contain drop-shadow" loading="eager" decoding="async" draggable="false">
+  </a>
+
+      <!-- Top-right brandmark (link to home) -->
+  <a href="https://www.unith.ai/"
+  aria-label="Go to Home"
+  class="fixed top-4 right-4 z-50 block rounded-xl bg-white/10 border border-white/20 backdrop-blur px-2 py-2 hover:bg-white/20 transition">
+  <img src="images/Unith-Brandmark-4.png"
+      alt="UNITH brandmark"
+      class="h-10 w-10 md:h-12 md:w-12 object-contain drop-shadow"
+      loading="eager"
+      decoding="async"
+      draggable="false">
+  </a>
+
+    <!-- Contenido de la Landing Page (Se oculta al abrir el chat) --><div id="landing-content" class="w-full max-w-6xl p-4 sm:p-8">
+        
+           <!-- HERO -->
+<section class="w-full py-12">
+  <div class="max-w-7xl mx-auto px-4 text-center">
+    <!-- Reemplazo del H1 por el wordmark -->
+    <div class="flex justify-center">
+      <picture>
+        <img
+          src="images/Unith-Wordmark-1.png"
+          alt="UNITH"
+          class="h-12 md:h-14 w-auto mx-auto"
+          loading="eager"
+          decoding="async"
+        />
+      </picture>
+    </div>
+
+    <!-- Conservamos el subtítulo para no romper la lógica existente -->
+    <p id="initial-message" class="text-xl sm:text-2xl text-gray-600 mt-3">
+      Elige la función para iniciar tu interacción.
+    </p>
+
+    <div id="selection-subtitle" class="hidden text-center mt-6 text-2xl sm:text-3xl font-bold text-unith-blue"></div>
+  </div>
+</section>
+
+        <!-- Secciones (Tarjetas) --><section id="main-container" class="flex flex-wrap justify-center gap-6 mt-8 sm:mt-12 transition-all duration-500">
+            
+            <!-- Tarjeta HR -->
+            <div onclick="selectSection('HR')" data-section="HR" class="category-card bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-blue-100 w-full md:w-[45%] lg:w-[23%] cursor-pointer hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+                <div class="card-content text-center">
+                    <div class="w-full h-36 sm:h-40 rounded-xl overflow-hidden shadow mb-4">
+                        <img src="images/interview_1.jpg" alt="Recursos Humanos" class="w-full h-full object-cover" loading="lazy" decoding="async" />
+                    </div>
+                    <h2 class="text-2xl font-bold text-unith-dark">Recursos Humanos (HR)</h2>
+                </div>
+            </div>
+
+            <!-- Tarjeta Sales -->
+            <div onclick="selectSection('Sales')" data-section="Sales" class="category-card bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-blue-100 w-full md:w-[45%] lg:w-[23%] cursor-pointer hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+                <div class="card-content text-center">
+                    <div class="w-full h-36 sm:h-40 rounded-xl overflow-hidden shadow mb-4">
+                        <img src="images/lead_generation_1.jpeg" alt="Ventas" class="w-full h-full object-cover" loading="lazy" decoding="async" />
+                    </div>
+                    <h2 class="text-2xl font-bold text-unith-dark">Marketing Digital (Sales)</h2>
+                </div>
+            </div>
+
+            <!-- Tarjeta Customer Support -->
+            <div onclick="selectSection('CustomerSupport')" data-section="CustomerSupport" class="category-card bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-blue-100 w-full md:w-[45%] lg:w-[23%] cursor-pointer hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+                <div class="card-content text-center">
+                    <div class="w-full h-36 sm:h-40 rounded-xl overflow-hidden shadow mb-4">
+                        <img src="images/customerSupport_1.jpg" alt="Atención al Cliente" class="w-full h-full object-cover" loading="lazy" decoding="async" />
+                    </div>
+                    <h2 class="text-2xl font-bold text-unith-dark">Atención al Cliente</h2>
+                </div>
+            </div>
+
+            <!-- Tarjeta E-learning -->
+            <div onclick="selectSection('ELearning')" data-section="ELearning" class="category-card bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-blue-100 w-full md:w-[45%] lg:w-[23%] cursor-pointer hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+                <div class="card-content text-center">
+                    <div class="w-full h-36 sm:h-40 rounded-xl overflow-hidden shadow mb-4">
+                        <img src="images/e_learning/e_learning_1.jpg" alt="E-learning" class="w-full h-full object-cover" loading="lazy" decoding="async" />
+                    </div>
+                    <h2 class="text-2xl font-bold text-unith-dark">E-learning</h2>
+                </div>
+            </div>
+
+            <!-- Tarjeta Car Showroom -->
+            <div onclick="selectSection('CarShowroom')" data-section="CarShowroom" class="category-card bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-blue-100 w-full md:w-[45%] lg:w-[23%] cursor-pointer hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+                <div class="card-content text-center">
+                    <div class="w-full h-36 sm:h-40 rounded-xl overflow-hidden shadow mb-4">
+                        <img src="images/car_showroom_1.webp" alt="Car Showroom" class="w-full h-full object-cover" loading="lazy" decoding="async" />
+                    </div>
+                    <h2 class="text-2xl font-bold text-unith-dark">Car Showroom</h2>
+                </div>
+            </div>
+
+            <!-- Tarjeta Lead Capture -->
+            <div onclick="selectSection('CaptureLead')" data-section="CaptureLead" class="category-card bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-blue-100 w-full md:w-[45%] lg:w-[23%] cursor-pointer hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+                <div class="card-content text-center">
+                    <div class="w-full h-36 sm:h-40 rounded-xl overflow-hidden shadow mb-4">
+                        <img src="images/capture_lead_01.jpg" alt="Capture-Lead" class="w-full h-full object-cover" loading="lazy" decoding="async" />
+                    </div>
+                    <h2 class="text-2xl font-bold text-unith-dark">Capture Lead</h2>
+                </div>
+            </div>
+            
+            <!-- Tarjeta video - Streaming -->
+            <div onclick="selectSection('StreamingVideo')" data-section="StreamingVideo" class="category-card bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-blue-100 w-full md:w-[45%] lg:w-[23%] cursor-pointer hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+                <div class="card-content text-center">
+                    <div class="w-full h-36 sm:h-40 rounded-xl overflow-hidden shadow mb-4">
+                        <img src="images/Streaming_Video_01.jpg" alt="Streaming-Video" class="w-full h-full object-cover" loading="lazy" decoding="async" />
+                    </div>
+                    <h2 class="text-2xl font-bold text-unith-dark">Streaming Demo Video</h2>
+                </div>
+            </div>
+  
+            <!-- Tarjeta Rocketman - Streaming (alto uniforme) -->
+            <div onclick="selectSection('StreamingLive')" data-section="StreamingLive" class="category-card bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-blue-100 w-full md:w-[45%] lg:w-[23%] cursor-pointer hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+                <div class="card-content text-center">
+                    <div class="w-full h-36 sm:h-40 rounded-xl overflow-hidden shadow mb-4">
+                        <img src="images/Streaming_Live_01.png" alt="Streaming-Live" class="w-full h-full object-cover" loading="lazy" decoding="async" />
+                    </div>
+                    <h2 class="text-2xl font-bold text-unith-dark">Rocketman Streaming</h2>
+                </div>
+            </div>
+        </section>
+
+        <!-- Selector de Idioma (Inicialmente oculto) --><section id="language-selector" class="mt-16 pt-8 border-t border-blue-200 w-full max-w-xl mx-auto hidden text-center">
+            <h3 class="text-3xl font-bold text-unith-dark mb-6">
+                Selecciona el Idioma
+            </h3>
+            
+            <div class="flex justify-center space-x-16 sm:space-x-24"> <!-- AUMENTADO: Mayor separación entre banderas -->
+                <!-- Bandera de España --><a href="javascript:void(0)" onclick="goToChat('ES')" class="flex flex-col items-center p-4 rounded-xl hover:bg-blue-50 transition-colors duration-200">
+                    <span class="flag-icon" role="img" aria-label="Bandera de España">🇪🇸</span>
+                    <span class="text-lg font-medium text-unith-dark mt-4">Español</span>
+                </a>
+
+                <!-- Bandera de Reino Unido --><a href="javascript:void(0)" onclick="goToChat('UK')" class="flex flex-col items-center p-4 rounded-xl hover:bg-blue-50 transition-colors duration-200">
+                    <span class="flag-icon" role="img" aria-label="Bandera de Reino Unido">🇬🇧</span>
+                    <span class="text-lg font-medium text-unith-dark mt-4">English</span>
+                </a>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Contenedor del Iframe (Chat) - Inicialmente oculto --><div id="iframe-container" class="hidden">
+        
+        <!-- Botón para cerrar el Iframe y volver a la Landing --><button onclick="closeIframe()" class="absolute top-4 right-4 z-50 bg-white p-2 rounded-full shadow-lg hover:bg-gray-100 transition-colors duration-200">
+            <!-- Icono 'X' (cruz) simple --><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-unith-dark">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+
+        <iframe id="chat-iframe" title="Unith AI Assistant Chat" allow="microphone; camera" scrolling="no"></iframe>
+    </div>
+
+    <!-- Script seguro (cerrado correctamente) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Aquí podríamos validar carga de imágenes si hace falta.
+        });
+    </script>
+</body>
+</html>

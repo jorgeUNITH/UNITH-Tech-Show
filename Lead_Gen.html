@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lead Generation</title>
+    <!-- Incluye Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configuración de la fuente Inter -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            /* Fondo degradado solicitado */
+            background: linear-gradient(rgb(239, 246, 255) 0%, rgba(59, 130, 246, 0.5) 100%);
+            opacity: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        /* Estilo base para el marco del móvil */
+        .phone-frame {
+            position: relative;
+            width: 320px; /* Tamaño fijo para aspecto móvil */
+            height: 600px;
+            border: 12px solid #1f2937; /* Gris oscuro para el marco */
+            border-radius: 40px; /* Esquinas muy redondeadas */
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+            background-color: #000; /* Fondo negro cuando está "apagado" */
+            transition: all 0.5s ease;
+        }
+
+        /* Simulación de botón de encendido y altavoz */
+        .phone-frame::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 8px;
+            background-color: #1f2937;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+            z-index: 10;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background-color: #fff;
+            position: relative;
+            z-index: 5;
+            transition: background-color 0.5s ease;
+        }
+
+        /* Clase para simular el móvil "apagado" */
+        .phone-off .phone-screen {
+            background-color: #000;
+            cursor: default !important;
+        }
+
+        /* Estilo para el iframe del chat, forzando aspecto móvil */
+        .chat-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Estilo para el iframe de registro (pantalla completa) */
+        .registration-iframe {
+            width: 100%;
+            height: calc(100vh - 8rem); /* Altura completa menos espacio para el botón de cerrar */
+            border: none;
+            border-radius: 0.5rem;
+        }
+
+        /* Contenedor principal para centrar en el móvil */
+        @media (max-width: 768px) {
+            .phone-container {
+                flex-direction: column;
+            }
+            .phone-frame {
+                margin-bottom: 2rem;
+            }
+        }
+    </style>
+</head>
+<body id="appBody">
+
+    <div id="main-content" class="w-full h-full flex flex-col items-center justify-center p-4">
+        <h1 class="text-4xl font-extrabold text-blue-900 mb-8 mt-4 tracking-tight">Lead Generation</h1>
+
+        <!-- Contenedor principal de los móviles -->
+        <div id="phones-view" class="phone-container flex flex-wrap justify-center items-start gap-8 md:gap-12 transition-opacity duration-500 w-full max-w-6xl">
+            
+            <!-- Mobile Lado Izquierdo (Video) -->
+            <div id="left-phone" class="phone-frame cursor-pointer hover:shadow-2xl hover:scale-[1.01] transition-transform duration-300">
+                <div class="phone-screen p-0">
+                    <!-- CONTENIDO DEL VIDEO EMBEBIDO (ACTUALIZADO CON TU URL DE YOUTUBE) -->
+                    <div id="video-content" class="w-full h-full relative rounded-[28px] overflow-hidden">
+                        <!-- Usamos el formato embed de YouTube para el video 'veMKN4H_uQI' -->
+                        <iframe width="100%" height="100%"
+                            src="https://www.youtube.com/embed/veMKN4H_uQI?autoplay=1&mute=1&controls=0&loop=1&playlist=veMKN4H_uQI&modestbranding=1&rel=0&disablekb=1&enablejsapi=1"
+                            title="Video Publicitario para META"
+                            frameborder="0"
+                            allow="autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                        <!-- Overlay para capturar el click y dar la instrucción -->
+                        <div class="absolute inset-0 flex justify-center items-center bg-black/40">
+                            <p class="text-white text-lg font-bold p-3 rounded-lg bg-blue-700/80 shadow-lg text-center">
+                                Clic para Continuar
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Lado Derecho (Chat) -->
+            <div id="right-phone" class="phone-frame phone-off">
+                <!-- El iframe se cargará aquí cuando el estado cambie a 'chat' -->
+                <div id="chat-screen" class="phone-screen flex justify-center items-center p-2">
+                    <p class="text-white text-center text-lg font-light">Móvil en Espera</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Botón de Acción Principal -->
+        <button id="data-registration-button"
+            class="mt-12 px-8 py-3 bg-blue-600 text-white font-bold rounded-full shadow-lg hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-300"
+            onclick="showRegistrationView()">
+            Registro de Datos
+        </button>
+    </div>
+
+    <!-- Vista de Registro de Datos (Modal de Pantalla Completa) -->
+    <div id="registration-view" class="fixed inset-0 bg-white/95 backdrop-blur-sm hidden flex-col items-center p-4 md:p-8 z-50 transition-opacity duration-300">
+        <div class="w-full max-w-7xl h-full flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-blue-800">Hoja de Registro de Leads</h2>
+                <button
+                    class="px-6 py-2 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 transition"
+                    onclick="showPhonesView()">
+                    Cerrar
+                </button>
+            </div>
+            <iframe id="registration-iframe" class="registration-iframe flex-grow rounded-lg shadow-xl" 
+                src="https://docs.google.com/spreadsheets/d/1cMYZ50PkHJy3Mvds6MSXu29JkXkWcFEPvpKufINBzU8/edit?gid=0" 
+                title="Google Sheet de Registro de Datos" 
+                allowfullscreen>
+            </iframe>
+        </div>
+    </div>
+
+
+    <script>
+        // --- Gestión de Estados de la Aplicación ---
+        let appState = 'phones'; // 'phones', 'chat', 'registration'
+
+        // Elementos del DOM
+        const leftPhone = document.getElementById('left-phone');
+        const rightPhone = document.getElementById('right-phone');
+        const chatScreen = document.getElementById('chat-screen');
+        const phonesView = document.getElementById('phones-view');
+        const registrationView = document.getElementById('registration-view');
+        const registrationIframe = document.getElementById('registration-iframe');
+        const registrationButton = document.getElementById('data-registration-button');
+
+        const CHAT_URL = "https://chat.unith.ai/Unith-248/hellen-15439?api_key=eabc44486c174b0486c658c4dbd24ce9";
+
+        /**
+         * Transiciona del estado inicial (video) al estado de chat.
+         */
+        function startChatFlow() {
+            if (appState !== 'phones') return;
+
+            // 1. Apagar el móvil izquierdo (cambiar estilo a negro/apagado)
+            leftPhone.classList.add('phone-off');
+            leftPhone.classList.remove('cursor-pointer');
+            leftPhone.onclick = null; // Deshabilitar clicks
+
+            // 2. Encender el móvil derecho y cargar el iframe
+            rightPhone.classList.remove('phone-off');
+            
+            // Crear y cargar el iframe del chat
+            const chatIframe = document.createElement('iframe');
+            chatIframe.src = CHAT_URL;
+            chatIframe.classList.add('chat-iframe');
+            chatIframe.title = "Unith AI Chatbot";
+            chatIframe.allow = "camera; microphone";
+
+            // Limpiar contenido de espera y añadir el iframe
+            chatScreen.innerHTML = ''; 
+            chatScreen.appendChild(chatIframe);
+            
+            appState = 'chat';
+            console.log('Estado: Chat iniciado.');
+        }
+
+        /**
+         * Muestra la vista de registro (Google Sheet en pantalla completa).
+         */
+        function showRegistrationView() {
+            // Ocultar vista de móviles
+            phonesView.classList.add('hidden');
+            registrationButton.classList.add('hidden');
+
+            // Mostrar vista de registro
+            registrationView.classList.remove('hidden');
+            registrationView.classList.add('flex');
+            appState = 'registration';
+            console.log('Estado: Registro de Datos.');
+
+            // Recargar iframe de registro (necesario a veces para Sheets)
+            // registrationIframe.src = registrationIframe.src; // Esto no es necesario si el src no cambia.
+        }
+
+        /**
+         * Vuelve a la vista de los móviles.
+         */
+        function showPhonesView() {
+            // Ocultar vista de registro
+            registrationView.classList.add('hidden');
+            registrationView.classList.remove('flex');
+            
+            // Mostrar vista de móviles
+            phonesView.classList.remove('hidden');
+            registrationButton.classList.remove('hidden');
+
+            // Lógica para determinar el estado correcto al volver:
+            if (appState === 'registration') {
+                 // Si el móvil derecho tiene la clase 'phone-off', significa que nunca se hizo click en el video.
+                if (rightPhone.classList.contains('phone-off')) {
+                    // Volver al estado inicial
+                    appState = 'phones';
+                } else {
+                    // Volver al estado de chat (el chat sigue cargado en el móvil derecho)
+                    appState = 'chat';
+                }
+            }
+            console.log('Estado: Volviendo a la vista principal. Estado actual:', appState);
+        }
+
+        // --- Inicialización ---
+        window.onload = function() {
+            // Asignar el listener de click al móvil izquierdo (solo si está en el estado 'phones')
+            leftPhone.addEventListener('click', startChatFlow);
+            console.log('Aplicación iniciada. Estado: Phones (Inicial)');
+        };
+    </script>
+
+</body>
+</html>

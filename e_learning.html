@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Aula Viva · E-Learning</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Gloria+Hallelujah&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* Fondo del aula */
+    --classroom-bg: url('images/e_learning/classroom_01.jpg');
+    --cta:#f59e0b; --chalk:#fff; --frame:#6b4423; --greenboard:#1b3a2b; --ink:#0e1726;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:#f6fafc}
+  a{color:inherit;text-decoration:none}
+
+  /* ---------- ESCENAS ---------- */
+  .scene{position:relative}
+  .bg{position:absolute;inset:0;background-image:var(--classroom-bg);background-size:cover;background-position:center 55%}
+  .vignette{position:absolute;inset:-8%;pointer-events:none}
+
+  /* HERO */
+  .hero{min-height:96dvh;display:grid;place-items:center;overflow:hidden;background:linear-gradient(180deg,#fff9,#fff9);
+        transition:opacity .5s ease, transform .5s ease;}
+  .hero .bg{filter:brightness(1.15) contrast(1.05) saturate(1.03)}
+  .hero .vignette{background:radial-gradient(circle at 50% 45%, rgba(255,255,255,0) 0 60%, rgba(0,0,0,.06) 95%)}
+  .blackboard{position:relative;width:min(100%,980px);margin:4.5vh auto;background:var(--greenboard);
+              border:12px solid var(--frame);border-radius:18px;box-shadow:0 28px 80px rgba(0,0,0,.22)}
+  .blackboard__wrap{padding:48px 42px 34px}
+  .chalk{font-family:"Gloria Hallelujah",cursive;color:var(--chalk)}
+  .title{font-size:clamp(34px,6vw,68px);line-height:1.05;margin:.2rem 0 1rem}
+  .subtitle{font-size:clamp(16px,1.8vw,20px);opacity:.98;max-width:60ch;color:#f4fbff}
+  .cta-row{display:flex;gap:14px;flex-wrap:wrap;margin:1.2rem 0 0}
+  .btn{appearance:none;border:0;border-radius:999px;padding:12px 20px;font-weight:800;cursor:pointer;transition:.2s transform}
+  .btn--primary{background:var(--cta);color:#23180a}
+  .btn--ghost{background:transparent;border:2px solid rgba(255,255,255,.75);color:#fff}
+  .btn:hover{transform:translateY(-2px)}
+
+  /* ---------- AULA (overlay) ---------- */
+  #aula{position:fixed;inset:0;display:grid;place-items:center;overflow:hidden;background:#f8fcff;
+        opacity:0;pointer-events:none;transform:translateY(20px) scale(.985);transition:opacity .5s ease,transform .5s ease;z-index:50}
+  #aula .bg{opacity:.95;filter:brightness(1.12) contrast(1.04) saturate(1.04)}
+  #aula .vignette{background:radial-gradient(1200px 700px at 50% 35%, rgba(255,255,255,0), rgba(0,0,0,.05))}
+  .stage{position:relative;width:min(1100px,94%);margin:auto;display:grid;grid-template-columns:1.7fr 0.8fr;gap:18px;align-items:start}
+  @media (max-width:1024px){.stage{grid-template-columns:1fr}}
+  .panel{background:rgba(255,255,255,.64);backdrop-filter:blur(6px);border:1px solid rgba(15,23,42,.08);border-radius:20px;box-shadow:0 16px 54px rgba(2,6,23,.1)}
+
+  /* Pizarra madera */
+  .board{display:flex;align-items:center;justify-content:center;padding:0;transform:translateY(-8px)}
+  .board__wood{position:relative;width:100%;height:calc(min(52vh,460px));min-height:320px;border-radius:14px;padding:12px;
+               background:linear-gradient(45deg,#7a4a21,#9a6a3a 30%,#7a4a21 60%,#b07a46 100%);background-size:120% 120%;
+               box-shadow:0 10px 24px rgba(0,0,0,.08), inset 0 0 0 1px rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.08)}
+  .board__inner{background:#fff;border-radius:10px;width:100%;height:calc(100% - 24px);min-height:calc(320px - 24px);
+                border:3px solid #e8eef6;box-shadow:inset 0 0 0 2px #ffffff;position:relative;margin:auto;overflow:hidden}
+  .board__label{position:absolute;top:10px;left:12px;background:#0b1220;color:#cde4ff;font-size:.8rem;border-radius:999px;padding:4px 10px;border:1px solid rgba(255,255,255,.15);z-index:3}
+
+  /* --- CONTENIDO DINÁMICO DE LA PIZARRA --- */
+  .board__panel{position:absolute; inset:0; border-radius:8px; overflow:hidden; background:#ffffff;}
+  .board__panel img,.board__panel video{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
+  #boardImage{opacity:0; transition:opacity .35s ease}
+
+  /* Humano digital */
+  .monitor{padding:10px;display:flex;flex-direction:column;max-width:420px;justify-self:end}
+  .titlebar{display:flex;gap:6px;padding:6px}
+  .dot{width:10px;height:10px;border-radius:50%}
+  .dot--r{background:#ff5f57}.dot--y{background:#ffbd2e}.dot--g{background:#28c840}
+  #unithFrame{width:100%;height:min(64vh,560px);min-height:380px;border:0;border-radius:12px;background:#000}
+
+  /* Overlay activo por CSS (:target) */
+  #aula:target{opacity:1;pointer-events:auto;transform:none}
+  /* Además, cuando el overlay está activo, ocultamos el hero (por hash) */
+  #aula:target ~ .hero-hide{opacity:0;pointer-events:none;transform:translateY(-10px) scale(.99)}
+
+  /* Botón Volver */
+  .back{position:fixed;top:18px;left:18px;z-index:80;background:#0b1220;color:#e6f0ff;border:1px solid rgba(255,255,255,.15);
+        border-radius:999px;padding:10px 14px;font-weight:700;box-shadow:0 6px 16px rgba(2,6,23,.15);opacity:0;transform:translateY(-8px);
+        pointer-events:none;transition:.3s ease}
+  #aula:target ~ .back{opacity:1;transform:none;pointer-events:auto}
+
+  /* --- JS fallback (clase view-aula) --- */
+  body.view-aula #aula{opacity:1;pointer-events:auto;transform:none}
+  body.view-aula .hero-hide{opacity:0;pointer-events:none;transform:translateY(-10px) scale(.99)}
+</style>
+</head>
+<body>
+
+  <!-- AULA (overlay) -->
+  <section class="scene" id="aula" aria-labelledby="aula-title">
+    <div class="bg" aria-hidden="true"></div>
+    <div class="vignette" aria-hidden="true"></div>
+    <div class="stage">
+      <!-- PIZARRA dinámica -->
+      <div class="panel board">
+        <div class="board__wood">
+          <div class="board__inner">
+            <div class="board__label">Animals</div>
+
+            <!-- Panel dinámico: video + imagen -->
+            <div class="board__panel" id="boardPanel">
+              <video id="boardVideo" autoplay muted loop playsinline preload="auto"></video>
+              <img id="boardImage" alt="" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HUMANO DIGITAL -->
+      <div class="panel monitor">
+        
+        <iframe id="unithFrame"
+                src="https://chat.unith.ai/UNITH-760/carmen-19757?api_key=34efd4bac0624a2ab8f362efd7b3744d"
+                allow="microphone"
+                title="Profesora digital Laura"></iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- Botón Volver (cierra overlay limpiando el hash) -->
+  <a class="back" href="#">← Volver</a>
+
+  <!-- HERO -->
+  <header class="scene hero hero-hide" aria-labelledby="hero-title">
+    <div class="bg" aria-hidden="true"></div>
+    <div class="vignette" aria-hidden="true"></div>
+    <div class="blackboard" role="region" aria-label="Pizarra">
+      <div class="blackboard__wrap">
+        <div class="chalk" style="letter-spacing:.2em;text-transform:uppercase;font-weight:700;opacity:.9;font-size:.85rem">E-Learning inmersivo</div>
+        <h1 id="hero-title" class="title chalk">Aula Viva: aprende como si estuvieras en clase</h1>
+        <p class="subtitle">Dale a <strong>“Probar una clase”</strong> y entra a un aula real: pizarra al frente y profesora digital a la derecha.</p>
+        <div class="cta-row">
+          <a href="#aula" class="btn btn--primary" id="btnProbar">Probar una clase</a>
+          <a href="#planes" class="btn btn--ghost">Ver planes</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+<script>
+  // ======== TOPICS → ARCHIVOS (pizarra) ========
+  // Puedes cambiar rutas si guardas en otra carpeta
+  const TOPIC_FILES = {
+    'bienvenida': 'images/e_learning/welcome_school_01.webp',
+    'leones':      'images/e_learning/leones_01.jpg',
+    'jirafa':     'images/e_learning/jirafa-somali_01.jpg',
+    'ballena':    'images/e_learning/ballenas_01.jpg'
+  };
+  const DEFAULT_TOPIC = 'bienvenida';
+
+  // Normaliza entradas (por si llegan con mayúsculas / tildes / espacios)
+  function normalizeTopic(t){
+    return (t||'').toString().trim().toLowerCase();
+  }
+
+  // DOM refs
+  const boardVideo = document.getElementById('boardVideo');
+  const boardImage = document.getElementById('boardImage');
+
+  // Cambia el contenido de la pizarra a imagen o video
+  function setBoardMedia(src){
+    if(!src) return;
+    const abs = new URL(src, location.href).href;
+    const isVideo = /\.(mp4|webm|ogg)(\?|$)/i.test(abs);
+
+    // reset video
+    boardVideo.oncanplay = null;
+    boardVideo.onerror = null;
+    boardVideo.removeAttribute('src');
+    while (boardVideo.firstChild) boardVideo.removeChild(boardVideo.firstChild);
+
+    if (isVideo){
+      boardImage.style.opacity = 0;
+      const s = document.createElement('source');
+      s.src = abs;
+      // ajusta type si usas webm/ogg
+      s.type = abs.endsWith('.webm') ? 'video/webm' : 'video/mp4';
+      boardVideo.appendChild(s);
+      boardVideo.setAttribute('playsinline','');
+      boardVideo.setAttribute('muted','');
+      boardVideo.muted = true;
+      boardVideo.loop = true;
+      boardVideo.preload = 'auto';
+      boardVideo.load();
+      const tryPlay = () => boardVideo.play().catch(()=>{});
+      if (boardVideo.readyState >= 2) tryPlay(); else boardVideo.oncanplay = tryPlay;
+    } else {
+      boardImage.src = abs;
+      requestAnimationFrame(()=>{ boardImage.style.opacity = 1; });
+    }
+  }
+
+  // Cambia topic → busca archivo y aplica
+  function setTopic(topic){
+    const key = normalizeTopic(topic);
+    const file = TOPIC_FILES[key] || TOPIC_FILES[DEFAULT_TOPIC];
+    setBoardMedia(file);
+  }
+
+  // ======== DEBUG LOCAL (opcional): #topic=... ========
+  function applyHashTopic(){
+    const m = location.hash.match(/topic=([^&]+)/i);
+    if (m) setTopic(decodeURIComponent(m[1]));
+  }
+  window.addEventListener('hashchange', applyHashTopic);
+
+  // ======== SSE Subscription ========
+  // Ajusta room/URL a tu infraestructura
+  const ROOM_ID = 'e_learning';  // cambia si usas rooms distintos
+  const SSE_URL = 'https://sse-topic.unith.workers.dev/stream?room=' + encodeURIComponent(ROOM_ID);
+  (function connectSSE(){
+    try{
+      const ev = new EventSource(SSE_URL);
+      ev.onmessage = (e) => {
+        try{
+          const data = JSON.parse(e.data || '{}');
+          // esperamos payload: { event: "topic", topic: "<string>" }
+          if (data.event === 'topic' && data.topic) {
+            setTopic(data.topic);
+          }
+        }catch(_){}
+      };
+      ev.onerror = () => { /* opcional: reconexión/backoff */ };
+    }catch(_){}
+  })();
+
+  // ======== INIT ========
+  // Muestra una por defecto
+  setTopic(DEFAULT_TOPIC);
+  applyHashTopic();
+</script>
+</body>
+</html>
