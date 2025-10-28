@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital Marketing</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Digital Human bundles -->
+  <script defer src="https://embedded.unith.ai/dist/bundle.js"></script>
+  <link rel="stylesheet" href="https://embedded.unith.ai/dist/bundle.css" />
+  <link rel="stylesheet"
+        href="https://gpt-head-assets.unith.ai/fonts/stylesheet.css"
+        media="print"
+        onload="this.media='all'"/>
+  <script src="https://embedded.unith.ai/microsoft-speech-recognition.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+    /* ===== Base layout ===== */
+    html, body { height: auto; }
+    body {
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      margin: 0;
+      background: linear-gradient(rgb(239, 246, 255) 0%, rgba(59, 130, 246, 0.5) 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 1rem;
+      overflow-y: auto;
+    }
+
+    /* ===== Phones ===== */
+    .phone-frame {
+      position: relative;
+      height: min(78vh, 600px);
+      width: auto;
+      aspect-ratio: 320 / 600;
+      max-width: 90vw;
+      border: 12px solid #1f2937;
+      border-radius: 40px;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+      overflow: hidden;
+      background-color: #000;
+    }
+    .phone-frame::before {
+      content: '';
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 60px; height: 8px; background-color: #1f2937;
+      border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;
+      z-index: 10;
+    }
+    .phone-screen { width:100%; height:100%; background:#fff; position:relative; z-index:5; transition: background-color .5s; }
+    .phone-off .phone-screen { background:#000; cursor: default !important; }
+
+    .chat-iframe { width: 100%; height: 100%; border: 0; }
+    .registration-iframe { width: 100%; height: calc(100vh - 8rem); border: 0; border-radius: .5rem; }
+
+    @media (max-width: 768px) {
+      .phone-container { flex-direction: column; }
+      .phone-frame {
+        margin-bottom: 2rem;
+        height: min(75vh, calc(90vw * 1.875));
+        width: auto;
+        margin-left: auto; margin-right: auto;
+      }
+    }
+
+    /* ===== FAB ===== */
+    .fab {
+      position: fixed;
+      right: 1rem;
+      bottom: calc(1rem + env(safe-area-inset-bottom, 0));
+      z-index: 40;
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .875rem 1rem;
+      border-radius: 9999px;
+      background: #2563eb;
+      color: #fff;
+      font-weight: 700;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -2px rgba(0,0,0,.05);
+      border: 0;
+      cursor: pointer;
+    }
+    .fab:hover { background: #1d4ed8; }
+    .fab:focus { outline: none; box-shadow: 0 0 0 4px rgba(59,130,246,.4); }
+    @media (prefers-reduced-motion: no-preference) {
+      .fab { transition: transform .15s ease, background-color .15s ease, box-shadow .15s ease; }
+      .fab:hover { transform: translateY(-2px); }
+    }
+
+    /* ===== Overlay button “Click to Continue” ===== */
+    .overlay-btn{
+      position:absolute; inset:0;
+      display:flex; justify-content:center; align-items:center;
+      background:rgba(0,0,0,.4);
+      border:0; cursor:pointer; z-index:20;
+    }
+    .overlay-label{
+      color:#fff; font-weight:700; font-size:1.125rem;
+      padding:.75rem; border-radius:.5rem;
+      background:rgba(29,78,216,.8);
+      box-shadow:0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -2px rgba(0,0,0,.05);
+    }
+    .overlay-btn:focus{ outline:4px solid rgba(59,130,246,.4); outline-offset:2px; }
+    @media (prefers-reduced-motion:no-preference){
+      .overlay-btn{ transition:transform .15s ease; }
+      .overlay-btn:hover{ transform:translateY(-1px); }
+    }
+
+    /* ===== Blackout over the digital human ===== */
+    .blackout {
+      position: absolute;
+      inset: 0;
+      background: #000;
+      z-index: 999;     /* above any internal UI */
+      opacity: 1;
+      transition: opacity .25s ease;
+      pointer-events: none; /* doesn't block events under it */
+    }
+  </style>
+</head>
+<body id="appBody">
+
+  <div id="main-content" class="w-full flex flex-col items-center justify-start p-4">
+    <h1 class="text-4xl font-extrabold text-blue-900 mb-8 mt-4 tracking-tight">Digital Marketing</h1>
+
+    <div id="phones-view" class="phone-container flex flex-wrap justify-center items-start gap-8 md:gap-12 transition-opacity duration-500 w-full max-w-6xl">
+      <!-- Left: Video (valid user-gesture trigger) -->
+      <div id="left-phone" class="phone-frame cursor-pointer hover:shadow-2xl hover:scale-[1.01]">
+        <div class="phone-screen p-0">
+          <div id="video-content" class="w-full h-full relative rounded-[28px] overflow-hidden">
+            <iframe
+              id="promo-video"
+              width="100%" height="100%"
+              src="https://www.youtube.com/embed/veMKN4H_uQI?autoplay=1&mute=1&playsinline=1&controls=0&loop=1&playlist=veMKN4H_uQI&modestbranding=1&rel=0&disablekb=1&enablejsapi=1"
+              title="Promo Video"
+              allow="autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              loading="eager">
+            </iframe>
+            <!-- overlay button -->
+            <button id="continue-btn" class="overlay-btn" type="button" aria-label="Click to continue">
+              <span class="overlay-label">Click to Continue</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Embedded Digital Human -->
+      <div id="right-phone" class="phone-frame phone-off">
+        <!-- Inline black bg to avoid any first-paint flash -->
+        <div id="chat-screen" class="phone-screen p-0" style="background:#000;">
+          <!-- Blackout from first paint (inline to ensure immediate cover) -->
+          <div id="dh-blackout" class="blackout"
+               style="position:absolute;inset:0;background:#000;z-index:999;opacity:1;pointer-events:none;"></div>
+
+          <div
+            id="talking-head"
+            style="position:absolute; inset:0; width:100%; height:100%; margin:0;"
+            data-api_base="https://chat-origin.api.unith.live"
+            data-api_key="34efd4bac0624a2ab8f362efd7b3744d"
+            data-org_id="UNITH-760"
+            data-head_id="ainoa-19975"
+            data-theme="demo"
+            data-vm_version="1"
+            data-time_pressure="false"
+            data-subs_enabled="true"
+            data-mic_enabled="true"
+            data-widget_mode="false"
+            data-seamless_transitions="false"
+            data-embed="true"
+          ></div>
+
+          <!-- Placeholder while "off" (covered by blackout) -->
+          <div id="standby-msg" class="absolute inset-0 flex justify-center items-center">
+            <p class="text-white text-center text-lg font-light">Phone on Standby</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAB -->
+  <button id="data-registration-button"
+    class="fab"
+    onclick="showRegistrationView()"
+    aria-label="Open data registration">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    Data Registration
+  </button>
+
+  <!-- Registration modal -->
+  <div id="registration-view" class="fixed inset-0 bg-white/95 backdrop-blur-sm hidden flex-col items-center p-4 md:p-8 z-50 transition-opacity duration-300">
+    <div class="w-full max-w-7xl h-full flex flex-col">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-bold text-blue-800">Lead Registration Sheet</h2>
+        <button class="px-6 py-2 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 transition" onclick="showPhonesView()">Close</button>
+      </div>
+      <iframe id="registration-iframe" class="registration-iframe flex-grow rounded-lg shadow-xl"
+        src="https://docs.google.com/spreadsheets/d/1M9kUEMGGDXTsziE5oag8naM-kKaPF1DxLEWvgBZwNV8/edit?usp=sharing"
+        title="Lead Registration Google Sheet" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <!-- API de IFrame de YouTube para poder controlar sonido/pausa -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+
+  <script>
+    let appState = 'phones';
+    const leftPhone = document.getElementById('left-phone');
+    const rightPhone = document.getElementById('right-phone');
+    const phonesView = document.getElementById('phones-view');
+    const registrationView = document.getElementById('registration-view');
+    const registrationButton = document.getElementById('data-registration-button');
+    const standbyMsg = document.getElementById('standby-msg');
+    const continueBtn = document.getElementById('continue-btn');
+
+    // ====== YouTube Player (para iniciar con sonido y poder pausar/mutear) ======
+    let ytPlayer;
+
+    // La API de YouTube llamará a esta función cuando esté lista
+    window.onYouTubeIframeAPIReady = function () {
+      ytPlayer = new YT.Player('promo-video', {
+        events: { onReady: onYTReady }
+      });
+    };
+
+    function onYTReady(event) {
+      // Arranca el vídeo e intenta activar el sonido inmediatamente
+      try {
+        event.target.playVideo();
+        event.target.unMute();
+        event.target.setVolume(100);
+      } catch (e) {
+        // Si el navegador bloquea el autoplay con sonido, seguirá en mute
+      }
+    }
+
+    // Fallback por si la API aún no está lista pero queremos silenciar/pausar
+    function pausePromoVideoFallback() {
+      const iframe = document.getElementById('promo-video');
+      if (!iframe || !iframe.contentWindow) return;
+      iframe.contentWindow.postMessage(JSON.stringify({
+        event: 'command', func: 'pauseVideo', args: []
+      }), '*');
+      iframe.contentWindow.postMessage(JSON.stringify({
+        event: 'command', func: 'mute', args: []
+      }), '*');
+    }
+
+    // Auto-start the digital human after the user gesture
+    function autoStartTalkingHead() {
+      const SELECTOR = '#touch_to_start, [data-testid="lets-chat"], .lets-chat, button#lets-chat, button[data-action="start"]';
+
+      function tryClick() {
+        const btn = document.querySelector(SELECTOR);
+        if (btn) { btn.click(); return true; }
+        return false;
+      }
+
+      if (!tryClick()) setTimeout(tryClick, 120);
+      if (!tryClick()) setTimeout(tryClick, 300);
+
+      const mo = new MutationObserver(() => { if (tryClick()) mo.disconnect(); });
+      mo.observe(document.body, { childList: true, subtree: true });
+      setTimeout(() => mo.disconnect(), 12000);
+    }
+
+    function startChatFlow() {
+      if (appState !== 'phones') return;
+
+      // 1) Cortar sonido y pausar el vídeo al pulsar "Click to Continue"
+      if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
+        try {
+          ytPlayer.mute();
+          ytPlayer.pauseVideo();
+        } catch (e) {
+          pausePromoVideoFallback();
+        }
+      } else {
+        pausePromoVideoFallback();
+      }
+
+      // 2) Cambiar estados visuales
+      leftPhone.classList.add('phone-off');
+      leftPhone.classList.remove('cursor-pointer');
+      rightPhone.classList.remove('phone-off');
+
+      if (standbyMsg) standbyMsg.remove();
+
+      const blackout = document.getElementById('dh-blackout');
+      if (blackout) {
+        blackout.style.opacity = '0';
+        setTimeout(() => blackout.remove(), 280);
+      }
+
+      // 3) Arrancar humano digital
+      autoStartTalkingHead();
+
+      appState = 'chat';
+    }
+
+    function showRegistrationView() {
+      phonesView.classList.add('hidden');
+      registrationButton.classList.add('hidden');
+      registrationView.classList.remove('hidden');
+      registrationView.classList.add('flex');
+      appState = 'registration';
+    }
+
+    function showPhonesView() {
+      registrationView.classList.add('hidden');
+      registrationView.classList.remove('flex');
+      phonesView.classList.remove('hidden');
+      registrationButton.classList.remove('hidden');
+      if (appState === 'registration') {
+        appState = rightPhone.classList.contains('phone-off') ? 'phones' : 'chat';
+      }
+    }
+
+    // Eventos: left phone y overlay button
+    window.onload = function() {
+      leftPhone.addEventListener('click', (e)=>{ e.preventDefault(); startChatFlow(); });
+      leftPhone.addEventListener('keydown', (e)=>{ if (e.key==='Enter' || e.key===' ') { e.preventDefault(); startChatFlow(); }});
+      if (continueBtn){
+        continueBtn.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); startChatFlow(); });
+        continueBtn.addEventListener('keydown', (e)=>{ if (e.key==='Enter' || e.key===' ') { e.preventDefault(); e.stopPropagation(); startChatFlow(); }});
+      }
+    };
+  </script>
+</body>
+</html>

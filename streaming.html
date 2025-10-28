@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UNITH AI — Streaming Digital Human (Faster)</title>
+  <meta name="description" content="UNITH AI: Streaming Digital Human — faster, smoother, and in real time to capture and convert more opportunities." />
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" sizes="16x16" href="images/Favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="images/Favicon.png">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Typography -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap');
+    :root { font-family: 'Space Grotesk', system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    body {
+      background-image:
+        linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 35%),
+        radial-gradient(circle at 1px 1px, rgba(59,130,246,0.18) 1px, transparent 1.5px),
+        linear-gradient(180deg, #F6FAFF 0%, #CFE0FF 45%, #9AB6FF 100%);
+      background-size: auto, 18px 18px, auto;
+      background-repeat: no-repeat, repeat, no-repeat;
+      min-height: 100vh;
+    }
+    .glass {
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.5);
+    }
+    .panel.monitor{
+      display:flex;
+      flex-direction:column;
+      justify-self:stretch;
+      align-self:stretch;
+    }
+    /* Responsive wrapper for the iframe */
+    .th-wrap{
+      position:relative;
+      height: 80svh;     /* responsive viewport height suitable for mobile bars */
+      min-height:380px;
+      border-radius:12px;
+      overflow:hidden;
+      background:#000;
+    }
+    .th-wrap iframe{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      border:0;
+    }
+  </style>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'unith-blue': '#3B82F6',
+            'unith-dark': '#1F2937',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="p-0 sm:p-0 flex flex-col items-center">
+
+  <!-- Event badge -->
+  <a href="https://unith-26838362.hubspotpagebuilder.eu/madrid-tech-show-2025"
+     target="_blank" rel="noopener noreferrer"
+     aria-label="Madrid Tech Show 2025"
+     class="fixed top-4 left-4 z-50 block rounded-xl bg-white/10 border border-white/20 backdrop-blur px-2 py-2 hover:bg-white/20 transition">
+    <img src="images/madrid_tech_show.webp" alt="Madrid Tech Show" class="h-10 w-auto md:h-12 object-contain drop-shadow" loading="eager" decoding="async" draggable="false">
+  </a>
+
+  <!-- Brandmark -->
+  <a href="https://www.unith.ai/"
+     aria-label="Go to UNITH homepage"
+     class="fixed top-4 right-4 z-50 block rounded-xl bg-white/10 border border-white/20 backdrop-blur px-2 py-2 hover:bg-white/20 transition">
+    <img src="images/Unith-Brandmark-4.png" alt="UNITH brandmark" class="h-10 w-10 md:h-12 md:w-12 object-contain drop-shadow" loading="eager" decoding="async" draggable="false">
+  </a>
+
+  <!-- Main Content -->
+  <main class="w-full max-w-6xl p-4 sm:p-8">
+
+    <!-- HERO -->
+    <section class="w-full pt-14 sm:pt-20">
+      <div class="max-w-7xl mx-auto px-4 text-center">
+        <div class="flex justify-center">
+          <picture>
+            <img src="images/Unith-Wordmark-1.png" alt="UNITH" class="h-12 md:h-14 w-auto mx-auto" loading="eager" decoding="async" />
+          </picture>
+        </div>
+
+        <p class="mt-6 text-unith-dark/80 text-lg md:text-xl max-w-3xl mx-auto">
+          Capture more opportunities with a <span class="font-semibold">Streaming Digital Human — Faster</span> that assists, qualifies, and converts in real time.
+        </p>
+
+        <div class="mt-6 flex items-center justify-center gap-3">
+          <a href="#lead" class="inline-flex items-center gap-2 rounded-2xl px-5 py-3 bg-unith-blue text-white shadow hover:opacity-90 transition">
+            Request a demo
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+          <a href="#how-it-works" class="inline-flex items-center gap-2 rounded-2xl px-5 py-3 bg-white text-unith-dark shadow border hover:bg-white/80 transition">How it works</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- DIGITAL HUMAN via iframe -->
+    <section aria-labelledby="digital-human" class="w-full mt-10 md:mt-12 flex justify-center">
+      <div class="glass rounded-3xl shadow-xl p-3 sm:p-4 w-full max-w-[600px]">
+        <h2 id="digital-human" class="sr-only">Streaming Digital Human — Faster</h2>
+
+        <div class="panel monitor">
+          <div class="th-wrap">
+            <!-- Responsive iframe embed -->
+            <iframe
+              src="https://stream.unith.ai/UNITH-760/zoe-20002?api_key=34efd4bac0624a2ab8f362efd7b3744d"
+              title="UNITH Streaming Digital Human"
+              allow="microphone; autoplay; clipboard-read; clipboard-write"
+              referrerpolicy="no-referrer-when-downgrade"
+              loading="eager"
+            ></iframe>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BENEFITS -->
+    <section id="how-it-works" class="w-full mt-12 md:mt-16">
+      <div class="max-w-5xl mx-auto grid md:grid-cols-3 gap-4">
+        <div class="glass rounded-2xl p-5">
+          <h3 class="font-semibold text-unith-dark">Available 24/7 — Faster</h3>
+          <p class="mt-2 text-unith-dark/80 text-sm">Engage on web, kiosks, or displays. Ultra-low latency to answer and guide prospects to conversion.</p>
+        </div>
+        <div class="glass rounded-2xl p-5">
+          <h3 class="font-semibold text-unith-dark">Automatic qualification</h3>
+          <p class="mt-2 text-unith-dark/80 text-sm">Detects intent, captures key data, and sends it to your CRM automatically.</p>
+        </div>
+        <div class="glass rounded-2xl p-5">
+          <h3 class="font-semibold text-unith-dark">Simple integrations</h3>
+          <p class="mt-2 text-unith-dark/80 text-sm">Connect seamlessly with HubSpot, Salesforce, or your existing forms in minutes.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- LEAD FORM -->
+    <section id="lead" class="w-full mt-12 md:mt-16">
+      <div class="max-w-3xl mx-auto glass rounded-3xl p-6 md:p-8 shadow-xl">
+        <h2 class="text-2xl md:text-3xl font-semibold text-unith-dark text-center">Request a demo</h2>
+        <p class="mt-2 text-center text-unith-dark/70">Leave your details and we’ll get in touch shortly.</p>
+
+        <div class="mt-6">
+          <div class="w-full rounded-2xl overflow-hidden border border-white/60 bg-white/80 shadow">
+            <iframe
+              src="https://unith-26838362.hubspotpagebuilder.eu/madrid-tech-show-2025"
+              title="Demo form — UNITH AI"
+              class="block w-full h-[1350px] border-0"
+              loading="lazy"
+              scrolling="no"
+              referrerpolicy="no-referrer-when-downgrade"
+              allow="clipboard-read; clipboard-write; autoplay"
+            ></iframe>
+          </div>
+          <p class="mt-3 text-center text-unith-dark/60 text-xs">If you don’t see the form, <a class="underline" href="https://unith-26838362.hubspotpagebuilder.eu/madrid-tech-show-2025" target="_blank" rel="noopener noreferrer">open it in a new tab</a>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="w-full mt-14 md:mt-20 pb-12 text-center text-unith-dark/60 text-sm">
+      <div class="max-w-6xl mx-auto px-4">
+        <p>© <span id="year"></span> UNITH AI. All rights reserved.</p>
+      </div>
+    </footer>
+
+  </main>
+
+  <script>
+    // Dynamic year in footer
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
